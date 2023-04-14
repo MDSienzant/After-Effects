@@ -1,6 +1,6 @@
 (function (thisObj) {
     var scriptName = 'Add Color Tokens';
-    var scriptVersion = '0.0.2';
+    var scriptVersion = '0.0.3';
     var releaseYear = '2023';
     var author = 'Matthew Sienzant | sienzant@google.com';
     var helpURL = '';
@@ -8,48 +8,54 @@
     
     
     var mainFunc = function () {
-    // Get the selected layers
-    var selectedLayers = app.project.activeItem.selectedLayers;
+        // Get the selected layers
+        var selectedLayers = app.project.activeItem.selectedLayers;
 
-    // Check if any selected properties are color properties
-    var anyPropertiesAreColor = false;
-    for (var i = 0; i < selectedLayers.length; i++) {
-        var selectedLayer = selectedLayers[i];
-        var selectedProperties = selectedLayer.selectedProperties;
-        for (var j = 0; j < selectedProperties.length; j++) {
-            var selectedProperty = selectedProperties[j];
-            if (selectedProperty.propertyValueType === PropertyValueType.COLOR) {
-                anyPropertiesAreColor = true;
-                break;
-            }
-        }
-    }
-
-    if (!anyPropertiesAreColor) {
-        alert("Select at least one color property and try again.");
-    } else {
-        // Prompt user for token name
-        var tokenName = prompt("Enter a token name:", "");
-
-        // Check if user entered a name or hit escape
-        if (tokenName !== null && tokenName !== "") {
-            // Create the expression string that references the token
-            var expressionString = 'const token = footage("theme.jsx").sourceData; // references the imported JSX\nhexToRgb(token.' + tokenName + ') //converts hex to RGB using token file and token name';
-
-        // Loop through selected layers and properties and set the expression of each color property
+        // Check if any selected properties are color properties
+        var anyPropertiesAreColor = false;
         for (var i = 0; i < selectedLayers.length; i++) {
             var selectedLayer = selectedLayers[i];
             var selectedProperties = selectedLayer.selectedProperties;
             for (var j = 0; j < selectedProperties.length; j++) {
                 var selectedProperty = selectedProperties[j];
                 if (selectedProperty.propertyValueType === PropertyValueType.COLOR) {
-                    selectedProperty.expression = expressionString;
+                    anyPropertiesAreColor = true;
+                    break;
                 }
             }
         }
-     }
-    }
-};
+
+        if (!anyPropertiesAreColor) {
+            alert("Select at least one color property and try again.");
+        } else {
+            // Prompt user for token name
+            var tokenName = prompt("Enter a token name:", "");
+
+            // Check if user entered a name or hit escape
+            if (tokenName !== null && tokenName !== "") {
+                // Create the expression string that references the token
+                var expressionString = 'const token = footage("theme.jsx").sourceData; // references the imported JSX\nhexToRgb(token.' + tokenName + ') //converts hex to RGB using token file and token name';
+
+                // Wrap the expression setting code in an undo group
+                app.beginUndoGroup('Add Color Tokens');
+
+                // Loop through selected layers and properties and set the expression of each color property
+                for (var i = 0; i < selectedLayers.length; i++) {
+                    var selectedLayer = selectedLayers[i];
+                    var selectedProperties = selectedLayer.selectedProperties;
+                    for (var j = 0; j < selectedProperties.length; j++) {
+                        var selectedProperty = selectedProperties[j];
+                        if (selectedProperty.propertyValueType === PropertyValueType.COLOR) {
+                            selectedProperty.expression = expressionString;
+                        }
+                    }
+                }
+
+                // End the undo group
+                app.endUndoGroup();
+            }
+        }
+    };
 
     
     
