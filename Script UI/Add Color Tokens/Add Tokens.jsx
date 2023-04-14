@@ -1,6 +1,6 @@
 (function (thisObj) {
     var scriptName = 'Add Color Tokens';
-    var scriptVersion = '0.0.1';
+    var scriptVersion = '0.0.2';
     var releaseYear = '2023';
     var author = 'Matthew Sienzant | sienzant@google.com';
     var helpURL = '';
@@ -31,8 +31,10 @@
         // Prompt user for token name
         var tokenName = prompt("Enter a token name:", "");
 
-        // Create the expression string that references the token
-        var expressionString = 'const token = footage("theme.jsx").sourceData; // references the imported JSX\nhexToRgb(token.' + tokenName + ') //converts hex to RGB using token file and token name';
+        // Check if user entered a name or hit escape
+        if (tokenName !== null && tokenName !== "") {
+            // Create the expression string that references the token
+            var expressionString = 'const token = footage("theme.jsx").sourceData; // references the imported JSX\nhexToRgb(token.' + tokenName + ') //converts hex to RGB using token file and token name';
 
         // Loop through selected layers and properties and set the expression of each color property
         for (var i = 0; i < selectedLayers.length; i++) {
@@ -45,6 +47,7 @@
                 }
             }
         }
+     }
     }
 };
 
